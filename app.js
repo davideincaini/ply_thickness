@@ -9,12 +9,7 @@ const RESINS = [
     { name: "TC275-1", density: 1.26 },
     { name: "TC350-1", density: 1.29 },
     { name: "Toray Cetex® TC1000 Design", density: 1.30 },
-    { name: "Toray Cetex® TC1200", density: 1.32 },
-    { name: "ARS140GEN", density: 1.18 },
-    { name: "ARS110TEN", density: 1.16 },
-    { name: "ARS120EST", density: 1.18 },
-    
-    
+    { name: "Toray Cetex® TC1200", density: 1.32 }
 ];
 
 const FIBERS = [
@@ -32,7 +27,7 @@ const FIBERS = [
     { name: "Kevlar 49", density: 1.44 }
 ];
 
-const AREAL_WEIGHTS = [70, 80, 100, 120, 130, 140, 145, 150, 200, 245, 280, 300, 380, 400,540,630,800,100,1250];
+const AREAL_WEIGHTS = [70, 80, 100, 120, 130, 140, 145, 150, 200, 245, 280, 300, 380, 400, 650];
 
 // State
 let state = {
@@ -40,10 +35,10 @@ let state = {
     customResinDensity: '',
     selectedFiber: null,
     customFiberDensity: '',
-    arealWeight: 200,
+    arealWeight: 145,
     customArealWeight: '',
     isCustomArealWeight: false,
-    resinContent: 40.0
+    resinContent: 35.0
 };
 
 // Initialize
