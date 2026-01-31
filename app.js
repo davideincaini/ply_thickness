@@ -11,6 +11,8 @@ const RESINS = [
     { name: "Toray Cetex® TC1000 Design", density: 1.30 },
     { name: "Toray Cetex® TC1200", density: 1.32 },
     { name: "ARS140GEN", density: 1.18 },
+    { name: "ARS110TEN", density: 1.16 },
+    
 ];
 
 const FIBERS = [
