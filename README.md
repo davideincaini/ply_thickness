@@ -1,2 +1,2 @@
-# Ply Thickness Calculator - PWA
+# Ply Thickness Calculator 
 
