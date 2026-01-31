@@ -12,6 +12,8 @@ const RESINS = [
     { name: "Toray Cetex® TC1200", density: 1.32 },
     { name: "ARS140GEN", density: 1.18 },
     { name: "ARS110TEN", density: 1.16 },
+    { name: "ARS120EST", density: 1.18 },
+    
     
 ];
 
@@ -38,10 +40,10 @@ let state = {
     customResinDensity: '',
     selectedFiber: null,
     customFiberDensity: '',
-    arealWeight: 145,
+    arealWeight: 200,
     customArealWeight: '',
     isCustomArealWeight: false,
-    resinContent: 35.0
+    resinContent: 40.0
 };
 
 // Initialize
