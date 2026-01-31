@@ -36,16 +36,35 @@ let state = {
     customResinDensity: '',
     selectedFiber: null,
     customFiberDensity: '',
-    arealWeight: 380,
+    arealWeight: 145,
     customArealWeight: '',
     isCustomArealWeight: false,
-    resinContent: 40.0
+    resinContent: 35.0
 };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     populateSelects();
     attachEventListeners();
+
+    // Sync JS state with DOM defaults (in case the HTML has a selected value)
+    const awSelect = document.getElementById('arealWeightSelect');
+    if (awSelect && awSelect.value) {
+        state.arealWeight = parseInt(awSelect.value) || state.arealWeight;
+    }
+
+    const slider = document.getElementById('resinContentSlider');
+    if (slider && slider.value) {
+        state.resinContent = parseFloat(slider.value) || state.resinContent;
+        document.getElementById('resinContentValue').textContent = `${state.resinContent.toFixed(1)}%`;
+    }
+
+    // Ensure UI functions are safe to call when nothing is selected
+    updateResinUI();
+    updateFiberUI();
+
+    // Update controls and debug at load
+    updateCalculateButton();
     updateDebugInfo();
 });
 
@@ -143,11 +162,11 @@ function attachEventListeners() {
         if (state.isCustomArealWeight) {
             customInput.style.display = 'block';
             btn.classList.add('active');
-            btn.innerHTML = '<svg fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+            btn.innerHTML = '<svg fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1[...]'/></svg>';
         } else {
             customInput.style.display = 'none';
             btn.classList.remove('active');
-            btn.innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+            btn.innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83[...]"/></svg>';
         }
         updateCalculateButton();
         updateDebugInfo();
@@ -180,6 +199,12 @@ function updateResinUI() {
     const info = document.getElementById('resinDensityInfo');
     const customInput = document.getElementById('resinCustomInput');
     
+    if (!state.selectedResin) {
+        info.textContent = '';
+        customInput.style.display = 'none';
+        return;
+    }
+    
     if (state.selectedResin.isCustom) {
         info.textContent = '';
         customInput.style.display = 'block';
@@ -192,6 +217,12 @@ function updateResinUI() {
 function updateFiberUI() {
     const info = document.getElementById('fiberDensityInfo');
     const customInput = document.getElementById('fiberCustomInput');
+    
+    if (!state.selectedFiber) {
+        info.textContent = '';
+        customInput.style.display = 'none';
+        return;
+    }
     
     if (state.selectedFiber.isCustom) {
         info.textContent = '';
@@ -299,7 +330,7 @@ function updateDebugInfo() {
     const fiberDensity = getEffectiveFiberDensity();
     const arealWeight = getEffectiveArealWeight();
     
-    let html = '';
+    let html = ''; 
     
     if (resinDensity !== null) {
         html += `<div class="valid">Resin Density: ${resinDensity}</div>`;
@@ -357,7 +388,7 @@ function calculate() {
     document.getElementById('resultResinWeight').textContent = `${round3(nominalResinArealWeight).toFixed(3)} gsm`;
     document.getElementById('resultFiberVolume').textContent = `${round3(nominalFiberVolume).toFixed(3)}%`;
     document.getElementById('resultThicknessMM').textContent = `${round3(nominalCuredPlyThicknessMM).toFixed(3)} mm`;
-    document.getElementById('resultThicknessMils').textContent = `${round3(nominalCuredPlyThicknessMils).toFixed(3)} mils`;
+    // note: intentionally NOT writing to resultThicknessMils (element not present)
     document.getElementById('resultDensity').textContent = `${round3(nominalLaminateDensity).toFixed(3)} g/cm³`;
     
     // Show results
@@ -380,7 +411,7 @@ function clearForm() {
         customArealWeight: '',
         isCustomArealWeight: false,
         resinContent: 35.0
-    };
+    };  
     
     document.getElementById('resinSelect').value = '';
     document.getElementById('fiberSelect').value = '';
@@ -397,7 +428,7 @@ function clearForm() {
     document.getElementById('fiberCustomInput').style.display = 'none';
     document.getElementById('arealWeightCustomInput').style.display = 'none';
     document.getElementById('customWeightBtn').classList.remove('active');
-    document.getElementById('customWeightBtn').innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+    document.getElementById('customWeightBtn').innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 [...]"/></svg>';
     
     document.getElementById('results').classList.remove('visible');
     
