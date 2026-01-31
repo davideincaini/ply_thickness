@@ -46,6 +46,19 @@ let state = {
 // Calculation History (temporary, non-persistent)
 let calculationHistory = [];
 
+// Tab Navigation
+let currentTab = 0; // 0 = Ply Thickness, 1 = Resin Content
+
+// Resin Content Calculator State
+let resinState = {
+    shape: '',
+    diameter: '',
+    dimensionX: '',
+    dimensionY: '',
+    totalWeight: '',
+    faw: ''
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     populateSelects();
@@ -434,6 +447,189 @@ function clearForm() {
 
     updateCalculateButton();
     updateDebugInfo();
+}
+
+// ==================== TAB NAVIGATION ====================
+
+function switchTab(tabIndex) {
+    currentTab = tabIndex;
+
+    // Update tab visual states
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach((tab, index) => {
+        if (index === tabIndex) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+
+    // Slide to the selected calculator
+    const wrapper = document.getElementById('calculatorsWrapper');
+    if (tabIndex === 0) {
+        wrapper.classList.remove('slide-left');
+    } else {
+        wrapper.classList.add('slide-left');
+    }
+}
+
+// ==================== RESIN CONTENT CALCULATOR ====================
+
+// Initialize Resin Content Calculator event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Shape selection
+    const shapeSelect = document.getElementById('shapeSelect');
+    shapeSelect?.addEventListener('change', (e) => {
+        resinState.shape = e.target.value;
+        const circularGroup = document.getElementById('circularInputGroup');
+        const rectangularGroup = document.getElementById('rectangularInputGroup');
+
+        if (e.target.value === 'circular') {
+            circularGroup.style.display = 'block';
+            rectangularGroup.style.display = 'none';
+        } else if (e.target.value === 'rectangular') {
+            circularGroup.style.display = 'none';
+            rectangularGroup.style.display = 'block';
+        } else {
+            circularGroup.style.display = 'none';
+            rectangularGroup.style.display = 'none';
+        }
+
+        updateCalculateButtonResin();
+    });
+
+    // Input event listeners
+    document.getElementById('diameterInput')?.addEventListener('input', (e) => {
+        resinState.diameter = e.target.value;
+        updateCalculateButtonResin();
+    });
+
+    document.getElementById('dimensionXInput')?.addEventListener('input', (e) => {
+        resinState.dimensionX = e.target.value;
+        updateCalculateButtonResin();
+    });
+
+    document.getElementById('dimensionYInput')?.addEventListener('input', (e) => {
+        resinState.dimensionY = e.target.value;
+        updateCalculateButtonResin();
+    });
+
+    document.getElementById('totalWeightInput')?.addEventListener('input', (e) => {
+        resinState.totalWeight = e.target.value;
+        updateCalculateButtonResin();
+    });
+
+    document.getElementById('fawInputResin')?.addEventListener('input', (e) => {
+        resinState.faw = e.target.value;
+        updateCalculateButtonResin();
+    });
+
+    // Calculate button
+    document.getElementById('calculateBtnResin')?.addEventListener('click', calculateResinContent);
+
+    // Clear button
+    document.getElementById('clearBtnResin')?.addEventListener('click', clearResinForm);
+});
+
+function updateCalculateButtonResin() {
+    const btn = document.getElementById('calculateBtnResin');
+    if (!btn) return;
+
+    const canCalc = canCalculateResin();
+    btn.disabled = !canCalc;
+}
+
+function canCalculateResin() {
+    if (!resinState.shape) return false;
+    if (!resinState.totalWeight || parseFloat(resinState.totalWeight) <= 0) return false;
+    if (!resinState.faw || parseFloat(resinState.faw) <= 0) return false;
+
+    if (resinState.shape === 'circular') {
+        if (!resinState.diameter || parseFloat(resinState.diameter) <= 0) return false;
+    } else if (resinState.shape === 'rectangular') {
+        if (!resinState.dimensionX || parseFloat(resinState.dimensionX) <= 0) return false;
+        if (!resinState.dimensionY || parseFloat(resinState.dimensionY) <= 0) return false;
+    }
+
+    return true;
+}
+
+function calculateResinContent() {
+    if (!canCalculateResin()) return;
+
+    // Get values
+    const totalWeight = parseFloat(resinState.totalWeight);
+    const faw = parseFloat(resinState.faw);
+
+    // Calculate area based on shape
+    let areaCm2;
+    let dimensionsText;
+
+    if (resinState.shape === 'circular') {
+        const diameterMm = parseFloat(resinState.diameter);
+        const radiusCm = (diameterMm / 2) / 10; // mm to cm
+        areaCm2 = Math.PI * radiusCm * radiusCm;
+        dimensionsText = `Ø ${diameterMm.toFixed(1)} mm`;
+    } else if (resinState.shape === 'rectangular') {
+        const xMm = parseFloat(resinState.dimensionX);
+        const yMm = parseFloat(resinState.dimensionY);
+        const xCm = xMm / 10;
+        const yCm = yMm / 10;
+        areaCm2 = xCm * yCm;
+        dimensionsText = `${xMm.toFixed(1)} × ${yMm.toFixed(1)} mm`;
+    }
+
+    // Calculate fiber weight
+    // FAW is in g/m², so convert area from cm² to m²
+    const areaM2 = areaCm2 / 10000;
+    const fiberWeight = areaM2 * faw;
+
+    // Calculate resin weight
+    const resinWeight = totalWeight - fiberWeight;
+
+    // Calculate resin content percentage
+    const resinContentPercent = (resinWeight / totalWeight) * 100;
+
+    // Round to 3 decimals
+    const round3 = (num) => Math.round(num * 1000) / 1000;
+
+    // Convert area from cm² to mm² (1 cm² = 100 mm²)
+    const areaMm2 = areaCm2 * 100;
+
+    // Display results - only Area (mm²) and Resin Content (%)
+    document.getElementById('resultAreaMm2').textContent = `${round3(areaMm2).toFixed(2)} mm²`;
+    document.getElementById('resultResinContentPercent').textContent = `${round3(resinContentPercent).toFixed(3)}%`;
+
+    // Show results
+    document.getElementById('resultsResin').classList.add('visible');
+}
+
+
+function clearResinForm() {
+    resinState = {
+        shape: '',
+        diameter: '',
+        dimensionX: '',
+        dimensionY: '',
+        totalWeight: '',
+        faw: ''
+    };
+
+    // Reset form
+    document.getElementById('shapeSelect').value = '';
+    document.getElementById('diameterInput').value = '';
+    document.getElementById('dimensionXInput').value = '';
+    document.getElementById('dimensionYInput').value = '';
+    document.getElementById('totalWeightInput').value = '';
+    document.getElementById('fawInputResin').value = '';
+
+    // Hide dimension inputs
+    document.getElementById('circularInputGroup').style.display = 'none';
+    document.getElementById('rectangularInputGroup').style.display = 'none';
+
+    // Hide results
+    document.getElementById('resultsResin').classList.remove('visible');
+
 }
 
 // Service Worker registration for PWA

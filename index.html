@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Ply Calculator">
+    <meta name="apple-mobile-web-app-title" content="Prepreg Calc">
     <meta name="theme-color" content="#007AFF">
 
-    <title>Ply Thickness Calculator</title>
+    <title>Prepreg Calculator</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -272,6 +272,8 @@
 
         .results.visible {
             display: block;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
 
         .results h2 {
@@ -362,6 +364,73 @@
             color: var(--primary);
         }
 
+        /* Tab Navigation */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--background);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            background: var(--background);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 16px;
+            right: 16px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        /* Calculator Sections Container */
+        .calculators-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calculators-wrapper {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 200%;
+        }
+
+        .calculator-section {
+            min-width: 50%;
+            width: 50%;
+            flex-shrink: 0;
+        }
+
+        .calculators-wrapper.slide-left {
+            transform: translateX(-50%);
+        }
 
 
         @media (max-width: 600px) {
@@ -378,227 +447,391 @@
 
 <body>
     <div class="header">
-        <h1>Ply Thickness</h1>
-        <p class="subtitle">Calculate Individual Ply Thickness</p>
-        <p class="description">This tool calculates the thickness of individual plies cured for thermoset systems</p>
+        <h1>Prepreg Calculator</h1>
+        <p class="subtitle">Cured Ply Thickness & Resin Content</p>
+        <p class="description">Calculate cured ply thickness and prepreg resin content for thermoset composite systems
+        </p>
         <div class="warning">Calculations assume 0% void content.</div>
     </div>
 
-    <div class="card">
-        <!-- Resin Selection -->
-        <div class="input-group">
-            <div class="label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
-                </svg>
-                Resin System
-            </div>
-            <select id="resinSelect">
-                <option value="">Select resin</option>
-            </select>
-            <div id="resinDensityInfo" class="info-text"></div>
-            <div id="resinCustomInput" style="display: none;">
-                <div class="custom-input-row">
-                    <label>Density (g/cm³):</label>
-                    <input type="number" id="customResinDensity" step="0.01" placeholder="e.g. 1.30">
-                </div>
-                <div id="resinError" class="error-text" style="display: none;">Invalid number</div>
-            </div>
-        </div>
-
-        <!-- Fiber Selection -->
-        <div class="input-group">
-            <div class="label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                Reinforcement Fiber
-            </div>
-            <select id="fiberSelect">
-                <option value="">Select fiber</option>
-            </select>
-            <div id="fiberDensityInfo" class="info-text"></div>
-            <div id="fiberCustomInput" style="display: none;">
-                <div class="custom-input-row">
-                    <label>Density (g/cm³):</label>
-                    <input type="number" id="customFiberDensity" step="0.01" placeholder="e.g. 1.80">
-                </div>
-                <div id="fiberError" class="error-text" style="display: none;">Invalid number</div>
-            </div>
-        </div>
-
-        <!-- Areal Weight -->
-        <div class="input-group">
-            <div class="label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                        clip-rule="evenodd" />
-                </svg>
-                Fiber Areal Weight (gsm)
-            </div>
-            <div class="areal-weight-controls">
-                <select id="arealWeightSelect"></select>
-                <div class="icon-button" id="customWeightBtn">
-                    <svg fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                </div>
-            </div>
-            <div id="arealWeightCustomInput" style="display: none;">
-                <div class="custom-input-row">
-                    <label>Custom value (gsm):</label>
-                    <input type="number" id="customArealWeight" step="1" placeholder="e.g. 145">
-                </div>
-                <div id="arealWeightError" class="error-text" style="display: none;">Invalid number</div>
-            </div>
-        </div>
-
-        <!-- Resin Content Slider -->
-        <div class="input-group">
-            <div class="label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                        clip-rule="evenodd" />
-                </svg>
-                Prepreg Resin Content (%)
-            </div>
-            <div class="slider-container">
-                <input type="range" id="resinContentSlider" min="0" max="100" step="0.5" value="40">
-                <div class="slider-value" id="resinContentValue">40.0%</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Buttons -->
-    <div class="button-group">
-        <button class="btn-clear" id="clearBtn">
-            <svg fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                    d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                    clip-rule="evenodd" />
-            </svg>
-            Clear
+    <!-- Tab Navigation -->
+    <div class="tab-bar">
+        <button class="tab active" onclick="switchTab(0)">
+            Ply Thickness
         </button>
-        <button class="btn-calculate" id="calculateBtn" disabled>
-            <svg fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" />
-            </svg>
-            Calculate
+        <button class="tab" onclick="switchTab(1)">
+            Resin Content
         </button>
     </div>
 
-    <!-- Results -->
-    <div class="card results" id="results">
-        <h2>Calculation Output</h2>
+    <!-- Calculators Container -->
+    <div class="calculators-container">
+        <div class="calculators-wrapper" id="calculatorsWrapper">
 
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                </svg>
-                Fiber Weight
+            <!-- Calculator 1: Ply Thickness -->
+            <div class="calculator-section" id="plyThicknessCalculator">
+                <div class="card">
+
+                    <!-- Resin Selection -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
+                            </svg>
+                            Resin System
+                        </div>
+                        <select id="resinSelect">
+                            <option value="">Select resin</option>
+                        </select>
+                        <div id="resinDensityInfo" class="info-text"></div>
+                        <div id="resinCustomInput" style="display: none;">
+                            <div class="custom-input-row">
+                                <label>Density (g/cm³):</label>
+                                <input type="number" id="customResinDensity" step="0.01" placeholder="e.g. 1.30">
+                            </div>
+                            <div id="resinError" class="error-text" style="display: none;">Invalid number</div>
+                        </div>
+                    </div>
+
+                    <!-- Fiber Selection -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            Reinforcement Fiber
+                        </div>
+                        <select id="fiberSelect">
+                            <option value="">Select fiber</option>
+                        </select>
+                        <div id="fiberDensityInfo" class="info-text"></div>
+                        <div id="fiberCustomInput" style="display: none;">
+                            <div class="custom-input-row">
+                                <label>Density (g/cm³):</label>
+                                <input type="number" id="customFiberDensity" step="0.01" placeholder="e.g. 1.80">
+                            </div>
+                            <div id="fiberError" class="error-text" style="display: none;">Invalid number</div>
+                        </div>
+                    </div>
+
+                    <!-- Areal Weight -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Fiber Areal Weight (gsm)
+                        </div>
+                        <div class="areal-weight-controls">
+                            <select id="arealWeightSelect"></select>
+                            <div class="icon-button" id="customWeightBtn">
+                                <svg fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div id="arealWeightCustomInput" style="display: none;">
+                            <div class="custom-input-row">
+                                <label>Custom value (gsm):</label>
+                                <input type="number" id="customArealWeight" step="1" placeholder="e.g. 145">
+                            </div>
+                            <div id="arealWeightError" class="error-text" style="display: none;">Invalid number</div>
+                        </div>
+                    </div>
+
+                    <!-- Resin Content Slider -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Prepreg Resin Content (%)
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" id="resinContentSlider" min="0" max="100" step="0.5" value="40">
+                            <div class="slider-value" id="resinContentValue">40.0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-clear" id="clearBtn">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Clear
+                    </button>
+                    <button class="btn-calculate" id="calculateBtn" disabled>
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" />
+                        </svg>
+                        Calculate
+                    </button>
+                </div>
+
+                <!-- Results -->
+                <div class="card results" id="results">
+                    <h2>Calculation Output</h2>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Fiber Weight
+                        </div>
+                        <div class="result-value" id="resultFiberContent">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            Fiber Volume
+                        </div>
+                        <div class="result-value" id="resultFiberVolume">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                            </svg>
+                            Prepreg Areal Weight
+                        </div>
+                        <div class="result-value" id="resultPrepregWeight">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Resin Areal Weight
+                        </div>
+                        <div class="result-value" id="resultResinWeight">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
+                            </svg>
+                            Laminate Density
+                        </div>
+                        <div class="result-value" id="resultDensity">-</div>
+                    </div>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Overlap
+                        </div>
+                        <div class="result-value" id="resultOverlap">-</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="result-item highlighted">
+                        <div class="result-label highlighted">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Cured Ply Thickness
+                        </div>
+                        <div class="result-value highlighted" id="resultThicknessMM">-</div>
+                    </div>
+                </div>
+
+                <!-- Calculation History -->
+                <div class="card" id="historyCard" style="display: none;">
+                    <h2>Calculation History</h2>
+                    <div style="overflow-x: auto;">
+                        <table id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Resin System</th>
+                                    <th>Reinforcement Fiber</th>
+                                    <th>Fiber Areal Weight</th>
+                                    <th>Prepreg Resin Content</th>
+                                    <th>Cured Ply Thickness</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- History rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="result-value" id="resultFiberContent">-</div>
-        </div>
+            <!-- End Calculator 1 -->
 
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                Fiber Volume
+            <!-- Calculator 2: Resin Content -->
+            <div class="calculator-section" id="resinContentCalculator">
+                <div class="card">
+                    <h2>Inputs</h2>
+
+                    <!-- Shape Selection -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Piece Shape
+                        </div>
+                        <select id="shapeSelect" class="select">
+                            <option value="">Select shape...</option>
+                            <option value="circular">Circular</option>
+                            <option value="rectangular">Rectangular</option>
+                        </select>
+                    </div>
+
+                    <!-- Circular Dimension (Diameter) -->
+                    <div class="input-group" id="circularInputGroup" style="display: none;">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-13a1 1 0 011 1v.5a1.5 1.5 0 013 0V7a1 1 0 102 0V6.5a3.5 3.5 0 10-7 0V7a1 1 0 102 0V6a1 1 0 011-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Diameter (mm)
+                        </div>
+                        <input type="number" id="diameterInput" class="input" placeholder="Enter diameter in mm"
+                            step="0.1">
+                    </div>
+
+                    <!-- Rectangular Dimensions (X, Y) -->
+                    <div id="rectangularInputGroup" style="display: none;">
+                        <div class="input-group">
+                            <div class="label">
+                                <svg fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                                </svg>
+                                Dimension X (mm)
+                            </div>
+                            <input type="number" id="dimensionXInput" class="input"
+                                placeholder="Enter X dimension in mm" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <div class="label">
+                                <svg fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                                </svg>
+                                Dimension Y (mm)
+                            </div>
+                            <input type="number" id="dimensionYInput" class="input"
+                                placeholder="Enter Y dimension in mm" step="0.1">
+                        </div>
+                    </div>
+
+                    <!-- Total Weight -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Total Piece Weight (g)
+                        </div>
+                        <input type="number" id="totalWeightInput" class="input"
+                            placeholder="Enter total weight in grams" step="0.01">
+                    </div>
+
+                    <!-- Fiber Areal Weight -->
+                    <div class="input-group">
+                        <div class="label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M14.243 5.757a6 6 0 10-.986 9.284 1 1 0 111.087 1.678A8 8 0 1118 10a3 3 0 01-4.8 2.401A4 4 0 1114 10a1 1 0 102 0c0-1.537-.586-3.07-1.757-4.243zM12 10a2 2 0 10-4 0 2 2 0 004 0z" />
+                            </svg>
+                            Fiber Areal Weight (gsm)
+                        </div>
+                        <input type="number" id="fawInputResin" class="input" placeholder="Enter FAW in gsm" step="1">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button class="btn-secondary" id="clearBtnResin">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Clear
+                        </button>
+                        <button class="btn-calculate" id="calculateBtnResin" disabled>
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Summary -->
+                <div class="card results" id="resultsResin" style="opacity: 0; pointer-events: none;">
+                    <h2>Results</h2>
+
+                    <div class="result-item">
+                        <div class="result-label">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm2 2v8h10V5H5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Total Area
+                        </div>
+                        <div class="result-value" id="resultAreaMm2">-</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="result-item highlighted">
+                        <div class="result-label highlighted">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Actual Resin Content
+                        </div>
+                        <div class="result-value highlighted" id="resultResinContentPercent">-</div>
+                    </div>
+                </div>
             </div>
-            <div class="result-value" id="resultFiberVolume">-</div>
-        </div>
+            <!-- End Calculator 2 -->
 
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
-                Prepreg Areal Weight
-            </div>
-            <div class="result-value" id="resultPrepregWeight">-</div>
-        </div>
-
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                        clip-rule="evenodd" />
-                </svg>
-                Resin Areal Weight
-            </div>
-            <div class="result-value" id="resultResinWeight">-</div>
-        </div>
-
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
-                </svg>
-                Laminate Density
-            </div>
-            <div class="result-value" id="resultDensity">-</div>
-        </div>
-
-        <div class="result-item">
-            <div class="result-label">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"
-                        clip-rule="evenodd" />
-                </svg>
-                Overlap
-            </div>
-            <div class="result-value" id="resultOverlap">-</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="result-item highlighted">
-            <div class="result-label highlighted">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z"
-                        clip-rule="evenodd" />
-                </svg>
-                Cured Ply Thickness
-            </div>
-            <div class="result-value highlighted" id="resultThicknessMM">-</div>
-        </div>
-    </div>
-
-    <!-- Calculation History -->
-    <div class="card" id="historyCard" style="display: none;">
-        <h2>Calculation History</h2>
-        <div style="overflow-x: auto;">
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Resin System</th>
-                        <th>Reinforcement Fiber</th>
-                        <th>Fiber Areal Weight</th>
-                        <th>Prepreg Resin Content</th>
-                        <th>Cured Ply Thickness</th>
-                    </tr>
-                </thead>
-                <tbody id="historyTableBody">
-                    <!-- History rows will be added here -->
-                </tbody>
-            </table>
         </div>
     </div>
 

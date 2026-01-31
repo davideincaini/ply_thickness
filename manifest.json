@@ -1,7 +1,7 @@
 {
-  "name": "Ply Thickness Calculator",
-  "short_name": "Ply Calc",
-  "description": "Calculate individual ply thickness for composite materials",
+  "name": "Prepreg Calculator",
+  "short_name": "Prepreg Calc",
+  "description": "Calculate cured ply thickness and prepreg resin content for composite materials",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
