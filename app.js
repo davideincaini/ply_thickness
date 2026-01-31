@@ -287,7 +287,7 @@ function updateDebugInfo() {
     const debugContent = document.getElementById('debugContent');
     
     // Show debug only in development (you can remove this in production)
-    const showDebug = true; // Set to false to hide debug info
+    const showDebug = false; // Set to false to hide debug info
     
     if (!showDebug) {
         debugInfo.style.display = 'none';
