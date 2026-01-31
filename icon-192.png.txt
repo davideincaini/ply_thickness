@@ -1,0 +1,17 @@
+Per creare le icone, puoi usare uno di questi metodi:
+
+1. ONLINE (più semplice):
+   - Vai su https://www.favicon-generator.org/
+   - Carica un'immagine (o crea un logo semplice)
+   - Genera e scarica icon-192.png e icon-512.png
+   - Metti i file nella cartella pwa/
+
+2. DA TESTO/EMOJI (veloce):
+   - Usa https://favicon.io/favicon-generator/
+   - Scrivi "PC" o usa l'emoji 📐
+   - Scarica le icone generate
+
+3. TEMPORANEAMENTE:
+   - Crea 2 file quadrati qualsiasi di 192x192px e 512x512px
+   - Rinominali icon-192.png e icon-512.png
+   - L'app funzionerà comunque!
