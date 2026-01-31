@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ply Thickness — Example / Test Page</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial; padding: 18px; background:#f7f7fb; color:#111 }
+    h1 { margin-bottom:8px }
+    .controls { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap }
+    button { padding:10px 14px; border-radius:8px; border:1px solid #ddd; background:white; cursor:pointer }
+    iframe { width:100%; height:800px; border:1px solid #ddd; border-radius:12px; background:white }
+    .note { font-size:13px; color:#666; margin-bottom:8px }
+  </style>
+</head>
+<body>
+  <h1>Ply Thickness — Example Page</h1>
+  <p class="note">Questa pagina carica l'app principale (index.html) in un iframe e fornisce pulsanti per impostare preset e lanciare il calcolo. Serve un semplice server statico per funzionare correttamente (vedi istruzioni sotto).</p>
+
+  <div class="controls">
+    <button id="preset1">Preset 1 — T300, 145 gsm, 35% resin</button>
+    <button id="preset2">Preset 2 — T700, 245 gsm, 30% resin</button>
+    <button id="clear">Clear (in iframe)</button>
+    <button id="openNew">Open app in new tab</button>
+  </div>
+
+  <p class="note">Istruzioni rapide: posizionati nella cartella del progetto e avvia un server statico (es. <code>python -m http.server 8000</code> oppure <code>npx http-server</code>), poi apri <code>http://localhost:8000/example.html</code>.</p>
+
+  <iframe id="appFrame" src="index.html" title="Ply Thickness App"></iframe>
+
+  <script>
+    // Utility per eseguire azioni sull'iframe (deve essere stesso origine)
+    const frame = document.getElementById('appFrame');
+
+    function withAppWindow(fn) {
+      const w = frame.contentWindow;
+      if (!w) {
+        alert('Impossibile accedere all\'iframe. Assicurati di servire i file dallo stesso host (stesso origine).');
+        return;
+      }
+      try {
+        fn(w);
+      } catch (err) {
+        console.error('Errore durante l\'esecuzione nel contesto iframe:', err);
+        alert('Errore: vedi console per dettagli.');
+      }
+    }
+
+    document.getElementById('preset1').addEventListener('click', () => {
+      withAppWindow((w) => {
+        // seleziona resin index 1 (8020) e fiber index 1 (Toray T300 / FT300)
+        w.document.getElementById('resinSelect').value = '1';
+        w.document.getElementById('resinSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('fiberSelect').value = '1';
+        w.document.getElementById('fiberSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('arealWeightSelect').value = '145';
+        w.document.getElementById('arealWeightSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('resinContentSlider').value = '35';
+        w.document.getElementById('resinContentSlider').dispatchEvent(new Event('input', { bubbles: true }));
+
+        // chiama calculate se il pulsante è abilitato
+        const btn = w.document.getElementById('calculateBtn');
+        if (!btn.disabled) btn.click();
+      });
+    });
+
+    document.getElementById('preset2').addEventListener('click', () => {
+      withAppWindow((w) => {
+        w.document.getElementById('resinSelect').value = '2'; // esempio differente
+        w.document.getElementById('resinSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('fiberSelect').value = '2';
+        w.document.getElementById('fiberSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('arealWeightSelect').value = '245';
+        w.document.getElementById('arealWeightSelect').dispatchEvent(new Event('change', { bubbles: true }));
+
+        w.document.getElementById('resinContentSlider').value = '30';
+        w.document.getElementById('resinContentSlider').dispatchEvent(new Event('input', { bubbles: true }));
+
+        const btn = w.document.getElementById('calculateBtn');
+        if (!btn.disabled) btn.click();
+      });
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      withAppWindow((w) => {
+        w.document.getElementById('clearBtn').click();
+      });
+    });
+
+    document.getElementById('openNew').addEventListener('click', () => {
+      window.open('index.html', '_blank');
+    });
+  </script>
+</body>
+</html>
