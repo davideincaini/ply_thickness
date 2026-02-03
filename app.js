@@ -1,6 +1,11 @@
 // Material Data
 const RESINS = [
     { name: "Custom", density: 0, isCustom: true },
+    { name: "ARS140GEN", density: 1.18 },
+
+    { name: "ARS 120EST", density: 1.18 },
+    { name: "ARS110TEN", density: 1.156 },
+    { name: "ARS110FAST", density: 1.16 },
     { name: "8020", density: 1.27 },
     { name: "8020-FR", density: 1.30 },
     { name: "BT250E-1", density: 1.24 },
@@ -10,8 +15,29 @@ const RESINS = [
     { name: "TC350-1", density: 1.29 },
     { name: "Toray Cetex® TC1000 Design", density: 1.30 },
     { name: "Toray Cetex® TC1200", density: 1.32 },
-    { name: "ARS140GEN", density: 1.18 }
-
+    // New Resins from Excel
+    { name: "E3-150", density: 1.18 },
+    { name: "E3-122", density: 1.20 },
+    { name: "X1-120", density: 1.20 },
+    { name: "X1-300", density: 1.20 },
+    { name: "E4-123", density: 1.20 },
+    { name: "E5-205", density: 1.20 },
+    { name: "H6-260", density: 1.20 },
+    { name: "E9-150", density: 1.225 },
+    { name: "E9-300", density: 1.55 },
+    { name: "E9-304", density: 1.41 },
+    { name: "X3-170", density: 1.20 },
+    { name: "X4-140", density: 1.20 },
+    { name: "R2-120", density: 1.18 },
+    { name: "DT120", density: 1.22 },
+    { name: "DT121", density: 1.22 },
+    { name: "DT806", density: 1.21 },
+    { name: "DT151 HE", density: 1.24 },
+    { name: "DT01CN", density: 1.29 },
+    { name: "ER432", density: 1.18 },
+    { name: "ER450", density: 1.23 },
+    { name: "ET445", density: 1.20 },
+    { name: "C-PREG", density: 1.22 }
 ];
 
 const FIBERS = [
@@ -26,7 +52,56 @@ const FIBERS = [
     { name: "IM-7", density: 1.78 },
     { name: "Glass (E)", density: 2.54 },
     { name: "Glass (S-2)", density: 2.46 },
-    { name: "Kevlar 49", density: 1.44 }
+    { name: "Kevlar 49", density: 1.44 },
+    // New Fibers from Excel
+    { name: "T300", density: 1.76 },
+    { name: "T300J", density: 1.78 },
+    { name: "T300C", density: 1.76 },
+    { name: "T400H", density: 1.80 },
+    { name: "T600S", density: 1.79 },
+    { name: "T650/35", density: 1.77 },
+    { name: "T650/35C", density: 1.77 },
+    { name: "T700S", density: 1.80 },
+    { name: "T800H", density: 1.81 },
+    { name: "T1000G", density: 1.80 },
+    { name: "M30S", density: 1.73 },
+    { name: "M30G", density: 1.73 },
+    { name: "M35J", density: 1.75 },
+    { name: "M40B", density: 1.81 },
+    { name: "M40J", density: 1.77 },
+    { name: "M46J", density: 1.84 },
+    { name: "M50J", density: 1.88 },
+    { name: "M55J", density: 1.91 },
+    { name: "M60J", density: 1.94 },
+    { name: "AS4C", density: 1.78 },
+    { name: "AS4D", density: 1.79 },
+    { name: "IM4", density: 1.78 },
+    { name: "IM4A", density: 1.78 },
+    { name: "AS4", density: 1.79 },
+    { name: "IM6", density: 1.76 },
+    { name: "IM7 6K", density: 1.76 },
+    { name: "IM7 12K 5", density: 1.78 },
+    { name: "IM7 12K 6", density: 1.79 },
+    { name: "IM8", density: 1.79 },
+    { name: "IM9", density: 1.80 },
+    { name: "34-700", density: 1.80 },
+    { name: "34-600", density: 1.79 },
+    { name: "TR 30", density: 1.79 },
+    { name: "TR50", density: 1.81 },
+    { name: "TRH 50", density: 1.81 },
+    { name: "MR 40", density: 1.76 },
+    { name: "MR 50", density: 1.80 },
+    { name: "MR60", density: 1.81 },
+    { name: "MR70", density: 1.82 },
+    { name: "MS 40", density: 1.77 },
+    { name: "HR 40", density: 1.82 },
+    { name: "HS 40", density: 1.85 },
+    { name: "PX35", density: 1.81 },
+    { name: "GLASS (E)", density: 2.57 },
+    { name: "GLASS (S-2)", density: 2.47 },
+    { name: "KEVLAR 49", density: 1.44 },
+    { name: "HTA40", density: 1.77 },
+    { name: "UTS50", density: 1.79 }
 ];
 
 const AREAL_WEIGHTS = [80, 100, 150, 200, 245, 265, 280, 380, 450, 540, 630, 800, 1000, 1200, 1250];
@@ -59,6 +134,17 @@ let resinState = {
     faw: ''
 };
 
+// Fiber Volume Calculator State
+let fvState = {
+    thickness: '',
+    plies: '',
+    selectedFiber: null,
+    selectedResin: null,
+    arealWeight: 380,
+    customArealWeight: '',
+    isCustomArealWeight: false
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     populateSelects();
@@ -72,11 +158,20 @@ function populateSelects() {
     const fiberSelect = document.getElementById('fiberSelect');
     const arealWeightSelect = document.getElementById('arealWeightSelect');
 
+    // Fiber Volume Tab Selects
+    const fvResinSelect = document.getElementById('fvResinSelect');
+    const fvFiberSelect = document.getElementById('fvFiberSelect');
+    const fvArealWeightSelect = document.getElementById('fvArealWeightSelect');
+
     RESINS.forEach((resin, index) => {
         const option = document.createElement('option');
         option.value = index;
         option.textContent = resin.name;
         resinSelect.appendChild(option);
+
+        // Clone for FV tab
+        const fvOption = option.cloneNode(true);
+        fvResinSelect.appendChild(fvOption);
     });
 
     FIBERS.forEach((fiber, index) => {
@@ -84,6 +179,10 @@ function populateSelects() {
         option.value = index;
         option.textContent = fiber.name;
         fiberSelect.appendChild(option);
+
+        // Clone for FV tab
+        const fvOption = option.cloneNode(true);
+        fvFiberSelect.appendChild(fvOption);
     });
 
     AREAL_WEIGHTS.forEach(weight => {
@@ -92,6 +191,11 @@ function populateSelects() {
         option.textContent = `${weight} gsm`;
         if (weight === 380) option.selected = true;
         arealWeightSelect.appendChild(option);
+
+        // Clone for FV tab
+        const fvOption = option.cloneNode(true);
+        if (weight === 380) fvOption.selected = true;
+        fvArealWeightSelect.appendChild(fvOption);
     });
 }
 
@@ -467,9 +571,11 @@ function switchTab(tabIndex) {
     // Slide to the selected calculator
     const wrapper = document.getElementById('calculatorsWrapper');
     if (tabIndex === 0) {
-        wrapper.classList.remove('slide-left');
-    } else {
-        wrapper.classList.add('slide-left');
+        wrapper.style.transform = 'translateX(0%)';
+    } else if (tabIndex === 1) {
+        wrapper.style.transform = 'translateX(-33.333%)';
+    } else if (tabIndex === 2) {
+        wrapper.style.transform = 'translateX(-66.666%)';
     }
 }
 
@@ -630,6 +736,193 @@ function clearResinForm() {
     // Hide results
     document.getElementById('resultsResin').classList.remove('visible');
 
+}
+
+// ==================== FIBER VOLUME CALCULATOR ====================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Inputs
+    const thicknessInput = document.getElementById('fvThicknessInput');
+    const pliesInput = document.getElementById('fvPliesInput');
+    const fiberSelect = document.getElementById('fvFiberSelect');
+    const resinSelect = document.getElementById('fvResinSelect');
+    const arealWeightSelect = document.getElementById('fvArealWeightSelect');
+    const customWeightBtn = document.getElementById('fvCustomWeightBtn');
+    const customWeightInput = document.getElementById('fvCustomArealWeight');
+
+    // Listeners
+    thicknessInput?.addEventListener('input', (e) => {
+        fvState.thickness = e.target.value;
+        updateCalculateButtonFv();
+    });
+
+    pliesInput?.addEventListener('input', (e) => {
+        fvState.plies = e.target.value;
+        updateCalculateButtonFv();
+    });
+
+    fiberSelect?.addEventListener('change', (e) => {
+        if (e.target.value !== '') {
+            fvState.selectedFiber = FIBERS[parseInt(e.target.value)];
+            document.getElementById('fvFiberDensityInfo').textContent = `Density: ${fvState.selectedFiber.density.toFixed(2)} g/cm³`;
+        } else {
+            fvState.selectedFiber = null;
+            document.getElementById('fvFiberDensityInfo').textContent = '';
+        }
+        updateCalculateButtonFv();
+    });
+
+    resinSelect?.addEventListener('change', (e) => {
+        if (e.target.value !== '') {
+            fvState.selectedResin = RESINS[parseInt(e.target.value)];
+            document.getElementById('fvResinDensityInfo').textContent = `Density: ${fvState.selectedResin.density.toFixed(2)} g/cm³`;
+        } else {
+            fvState.selectedResin = null;
+            document.getElementById('fvResinDensityInfo').textContent = '';
+        }
+        // Resin is optional for Vf, but needed for Weight%. Logic handles null.
+        updateCalculateButtonFv();
+    });
+
+    arealWeightSelect?.addEventListener('change', (e) => {
+        fvState.arealWeight = parseInt(e.target.value);
+        fvState.isCustomArealWeight = false;
+        document.getElementById('fvArealWeightCustomInput').style.display = 'none';
+        customWeightBtn.classList.remove('active');
+        updateCalculateButtonFv();
+    });
+
+    customWeightBtn?.addEventListener('click', () => {
+        fvState.isCustomArealWeight = !fvState.isCustomArealWeight;
+        const customInput = document.getElementById('fvArealWeightCustomInput');
+
+        if (fvState.isCustomArealWeight) {
+            customInput.style.display = 'block';
+            customWeightBtn.classList.add('active');
+            customWeightBtn.innerHTML = '<svg fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+        } else {
+            customInput.style.display = 'none';
+            customWeightBtn.classList.remove('active');
+            customWeightBtn.innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+        }
+        updateCalculateButtonFv();
+    });
+
+    customWeightInput?.addEventListener('input', (e) => {
+        fvState.customArealWeight = e.target.value;
+        updateCalculateButtonFv();
+    });
+
+    // Buttons
+    document.getElementById('fvCalculateBtn')?.addEventListener('click', calculateFiberVolume);
+    document.getElementById('fvClearBtn')?.addEventListener('click', clearFvForm);
+});
+
+function getFvEffectiveArealWeight() {
+    if (fvState.isCustomArealWeight) {
+        const value = parseFloat(fvState.customArealWeight);
+        return (value > 0) ? value : null;
+    }
+    return fvState.arealWeight;
+}
+
+function canCalculateFv() {
+    if (!fvState.thickness || parseFloat(fvState.thickness) <= 0) return false;
+    if (!fvState.plies || parseInt(fvState.plies) <= 0) return false;
+    if (!fvState.selectedFiber) return false;
+    if (getFvEffectiveArealWeight() === null) return false;
+    return true;
+}
+
+function updateCalculateButtonFv() {
+    const btn = document.getElementById('fvCalculateBtn');
+    if (btn) btn.disabled = !canCalculateFv();
+}
+
+function calculateFiberVolume() {
+    if (!canCalculateFv()) return;
+
+    const t = parseFloat(fvState.thickness); // mm
+    const n = parseInt(fvState.plies);
+    const rho_f = fvState.selectedFiber.density; // g/cm3
+    const faw = getFvEffectiveArealWeight(); // g/m2
+
+    // Fiber Volume Fraction Vf
+    // Vf = (n * FAW) / (rho_f * t * 10)
+    // Derivation:
+    // mass_fiber_per_m2 = n * faw (g)
+    // vol_fiber_per_m2 = mass / rho_f = (n * faw) / rho_f (cm3)
+    // vol_total_per_m2 = 1 m2 * t = 10000 cm2 * (t/10 cm) = 1000 * t (cm3)
+    // Vf = vol_fiber / vol_total = ((n * faw) / rho_f) / (1000 * t) 
+    //    = (n * faw) / (rho_f * 1000 * t)
+    // Vf% = Vf * 100 = (n * faw * 100) / (rho_f * 1000 * t) = (n * faw) / (rho_f * t * 10)
+
+    const vfPercent = (n * faw) / (rho_f * t * 10);
+
+    // Resin Content by Weight Wr
+    // Need Resin Density rho_r
+    let wrText = "Select resin to calculate";
+
+    if (fvState.selectedResin) {
+        const rho_r = fvState.selectedResin.density;
+        // Volume Resin % = 100 - Vf% (assuming 0% voids as per warning)
+        const vrPercent = 100 - vfPercent;
+
+        // Take a reference volume, e.g., 100 units
+        // Mass Fiber = Vf * rho_f
+        // Mass Resin = Vr * rho_r
+        // Wr% = Mass Resin / (Mass Resin + Mass Fiber) * 100
+
+        const massFiber = vfPercent * rho_f;
+        const massResin = vrPercent * rho_r;
+        const totalMass = massFiber + massResin;
+
+        const wrPercent = (massResin / totalMass) * 100;
+        wrText = `${wrPercent.toFixed(2)}%`;
+
+        // Also validate physical possibility
+        if (vfPercent > 100) {
+            wrText = "Impossible (Vf > 100%)";
+        }
+    }
+
+    // Ply Thickness
+    const plyThickness = t / n;
+
+    // Display
+    document.getElementById('resultFvPercent').textContent = `${vfPercent.toFixed(2)}%`;
+    document.getElementById('resultFvResinWeight').textContent = wrText;
+    document.getElementById('resultFvPlyThickness').textContent = `${plyThickness.toFixed(3)} mm`;
+
+    document.getElementById('resultsFiberVolume').classList.add('visible');
+}
+
+function clearFvForm() {
+    fvState = {
+        thickness: '',
+        plies: '',
+        selectedFiber: null,
+        selectedResin: null,
+        arealWeight: 380,
+        customArealWeight: '',
+        isCustomArealWeight: false
+    };
+
+    document.getElementById('fvThicknessInput').value = '';
+    document.getElementById('fvPliesInput').value = '';
+    document.getElementById('fvFiberSelect').value = '';
+    document.getElementById('fvResinSelect').value = '';
+    document.getElementById('fvArealWeightSelect').value = '380';
+    document.getElementById('fvCustomArealWeight').value = '';
+
+    document.getElementById('fvFiberDensityInfo').textContent = '';
+    document.getElementById('fvResinDensityInfo').textContent = '';
+    document.getElementById('fvArealWeightCustomInput').style.display = 'none';
+    document.getElementById('fvCustomWeightBtn').classList.remove('active');
+    document.getElementById('fvCustomWeightBtn').innerHTML = '<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+
+    document.getElementById('resultsFiberVolume').classList.remove('visible');
+    updateCalculateButtonFv();
 }
 
 // Service Worker registration for PWA

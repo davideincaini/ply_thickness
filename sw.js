@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ply-calculator-v3';
+const CACHE_NAME = 'ply-calculator-v9';
 const urlsToCache = [
   './',
   './index.html',
