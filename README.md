@@ -1,151 +1,96 @@
-# Ply Thickness Calculator - PWA
+# Prepreg Calculator — Cured Ply Thickness & Fiber Volume
 
-## 📱 Cos'è una PWA?
-Una Progressive Web App è un sito web che funziona come un'app nativa:
-- ✅ Installabile sulla home screen
-- ✅ Funziona offline
-- ✅ Nessuna scadenza (funziona per sempre!)
-- ✅ Nessun App Store necessario
-- ✅ Funziona su iPhone, Android, PC, Mac
+A Progressive Web App (PWA) for calculating the cured ply thickness (CPT) and fiber volume fraction of a prepreg laminate from material inputs. Built for real use on the shop floor — installable on iPhone, works offline.
 
-## 🚀 Come Installare
+---
 
-### Opzione 1: Hosting Gratuito con GitHub Pages (CONSIGLIATO)
+## The Problem
 
-1. **Crea un account GitHub** (se non ce l'hai già)
-   - Vai su https://github.com
-   - Clicca "Sign up"
+In composite manufacturing, predicting the cured ply thickness from prepreg material specs is a routine but non-trivial calculation. It requires combining fiber areal weight, resin content, fiber density, and resin density through the rule of mixtures. Doing this manually for multiple material combinations is slow and error-prone — this tool makes it instant.
 
-2. **Crea un nuovo repository**
-   - Clicca il + in alto a destra → "New repository"
-   - Nome: `ply-calculator` (o quello che vuoi)
-   - Spunta "Public"
-   - Clicca "Create repository"
+---
 
-3. **Carica i file**
-   - Clicca "uploading an existing file"
-   - Trascina tutti i file della cartella `pwa`:
-     - index.html
-     - app.js
-     - manifest.json
-     - sw.js
-     - icon-192.png (vedi sotto come crearla)
-     - icon-512.png (vedi sotto come crearla)
-   - Clicca "Commit changes"
+## Physics
 
-4. **Attiva GitHub Pages**
-   - Vai in Settings (del repository)
-   - Scorri fino a "Pages" nella sidebar sinistra
-   - Source: seleziona "main" branch
-   - Clicca "Save"
-   - Aspetta 1-2 minuti
+The app implements the **rule of mixtures** for composite laminates:
 
-5. **La tua app è online!**
-   - URL: `https://[tuo-username].github.io/ply-calculator/`
-   - Esempio: `https://davide.github.io/ply-calculator/`
-
-### Opzione 2: Hosting Locale (per test)
-
-1. **Installa Python** (se non ce l'hai già)
-   
-2. **Apri il terminale** nella cartella `pwa/`
-
-3. **Avvia un server locale:**
-   ```bash
-   # Python 3
-   python3 -m http.server 8000
-   
-   # Python 2
-   python -m SimpleHTTPServer 8000
-   ```
-
-4. **Apri il browser** su `http://localhost:8000`
-
-## 📐 Creare le Icone
-
-### Metodo Semplice (Online):
-
-1. Vai su https://favicon.io/favicon-generator/
-2. Scrivi "PC" o usa l'emoji 📐
-3. Scegli colore: blu (#007AFF)
-4. Genera e scarica
-5. Rinomina i file in:
-   - `icon-192.png` (192x192px)
-   - `icon-512.png` (512x512px)
-6. Metti nella cartella `pwa/`
-
-### Metodo Veloce (Temporaneo):
-Qualsiasi immagine quadrata funziona! Basta che si chiami `icon-192.png` e `icon-512.png`
-
-## 📲 Installare sul Telefono
-
-### iPhone:
-1. Apri Safari (non Chrome!)
-2. Vai all'URL della tua app
-3. Tocca il pulsante Condividi (quadrato con freccia)
-4. Scorri e tocca "Aggiungi a Home"
-5. Tocca "Aggiungi"
-6. L'icona appare sulla home screen! 🎉
-
-### Android:
-1. Apri Chrome
-2. Vai all'URL della tua app
-3. Tocca i tre puntini (⋮)
-4. Tocca "Installa app" o "Aggiungi a schermata Home"
-5. Conferma
-6. L'icona appare sulla home screen! 🎉
-
-## 🎯 Vantaggi della PWA
-
-| Feature | PWA | App Nativa (gratis) |
-|---------|-----|---------------------|
-| **Durata** | ♾️ Infinita | ⏱️ 7 giorni |
-| **Offline** | ✅ Funziona | ✅ Funziona |
-| **Aggiornamenti** | 🔄 Automatici | 🔌 Richiede Mac |
-| **Multi-device** | ✅ iPhone, Android, PC | ❌ Solo iPhone |
-| **Condivisione** | 🔗 Basta un link | ❌ Impossibile |
-| **Costo** | 💰 Gratis | 💰 Gratis (ma limitato) |
-
-## 🔄 Aggiornare l'App
-
-1. Modifica i file su GitHub (o localmente)
-2. Commit delle modifiche
-3. L'app si aggiorna automaticamente al prossimo refresh!
-
-## ❓ Troubleshooting
-
-### L'app non si installa su iPhone
-- Assicurati di usare **Safari** (non Chrome)
-- Verifica di avere **HTTPS** (GitHub Pages lo fornisce automaticamente)
-
-### L'app non funziona offline
-- Controlla che `sw.js` sia caricato correttamente
-- Apri Developer Tools → Application → Service Workers
-
-### Icone non visibili
-- Verifica che `icon-192.png` e `icon-512.png` esistano
-- Controlla che i nomi siano esatti (lowercase)
-
-## 📝 Files nella Cartella PWA
-
+**Prepreg Areal Weight** (total, fiber + resin):
 ```
-pwa/
-├── index.html       # Struttura HTML dell'app
-├── app.js          # Logica e calcoli
-├── manifest.json   # Configurazione PWA
-├── sw.js           # Service Worker (offline support)
-├── icon-192.png    # Icona piccola (da creare)
-├── icon-512.png    # Icona grande (da creare)
-└── README.md       # Questo file
+PAW = FAW / (1 - rc)
 ```
 
-## 🎉 Fatto!
+**Fiber Volume Fraction** (Vf):
+```
+Vf = (FAW / ρ_f) / [(FAW / ρ_f) + (RAW / ρ_r)]
+```
 
-Ora hai un'app completamente funzionale che:
-- ✅ Non scade mai
-- ✅ Funziona offline
-- ✅ È gratis per sempre
-- ✅ Funziona su tutti i dispositivi
-- ✅ Si aggiorna automaticamente
+**Laminate Density**:
+```
+ρ_lam = Vf · ρ_f + (1 - Vf) · ρ_r
+```
 
-**Buon calcolo! 🚀**
+**Cured Ply Thickness** (CPT):
+```
+CPT = (PAW / 1000) / ρ_lam     [mm]
+```
+
+Where: `FAW` = Fiber Areal Weight (g/m²), `rc` = resin content fraction, `ρ_f` = fiber density (g/cm³), `ρ_r` = resin density (g/cm³), `RAW` = Resin Areal Weight.
+
+---
+
+## Inputs
+
+| Parameter | Source |
+|---|---|
+| Fiber type | Dropdown (Toray T300, T700G, T700S, T800H...) or custom density |
+| Resin system | Dropdown (ARS140GEN, ARS120EST, ARS110TEN...) or custom density |
+| Fiber Areal Weight | Standard values (80–1250 g/m²) or custom |
+| Resin Content | Slider (%) |
+
+## Outputs
+
+| Result | Unit |
+|---|---|
+| Nominal Fiber Content | % by weight |
+| Prepreg Areal Weight | g/m² |
+| Fiber Volume Fraction (Vf) | % |
+| Laminate Density | g/cm³ |
+| **Cured Ply Thickness (CPT)** | mm |
+| Overlap recommendation | mm (based on FAW range) |
+
+---
+
+## Material Database
+
+Pre-loaded fiber densities: Toray T300/FT300, T700G, T700S, T800H and others.
+
+Pre-loaded resin densities: ARS140GEN, ARS120EST, ARS110TEN and others.
+
+All entries are overridable with custom values for materials not in the database.
+
+---
+
+## Technical Stack
+
+- **PWA** — installable on iPhone via Safari, works fully offline
+- **Service Worker** (`sw.js`) — caches all assets for offline use
+- **Pure HTML / CSS / JavaScript** — no frameworks, no build step
+- **iOS-native styling** — system font stack (`-apple-system`), iOS color palette, safe-area support
+
+---
+
+## Install on iPhone
+
+1. Open the app URL in **Safari**
+2. Tap the Share button → **Add to Home Screen**
+3. The app installs and works offline from that point
+
+---
+
+## Context
+
+Built by a process engineer with direct experience in prepreg layup and autoclave processing. The CPT calculation is one of the first things you need when qualifying a new material or verifying a ply schedule — having it available offline on the shop floor removes a common friction point.
+
+---
+
+*Part of [Davide Incaini's portfolio](https://github.com/davideincaini)*
