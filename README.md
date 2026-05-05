@@ -1,5 +1,8 @@
 # Prepreg Calculator — Cured Ply Thickness & Fiber Volume
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Open%20App-blue?style=for-the-badge&logo=github)](https://davideincaini.github.io/ply_thickness)
+[![PWA](https://img.shields.io/badge/PWA-Installable%20on%20iPhone-brightgreen?style=for-the-badge&logo=pwa)](https://davideincaini.github.io/ply_thickness)
+
 A Progressive Web App (PWA) for calculating the cured ply thickness (CPT) and fiber volume fraction of a prepreg laminate from material inputs. Built for real use on the shop floor — installable on iPhone, works offline.
 
 ---
